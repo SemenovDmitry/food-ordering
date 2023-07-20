@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 import { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
@@ -10,16 +10,16 @@ const productSchema = object({
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.product.findMany({ include: { brand: true, category: true } })
     return res.status(200).json(data)
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' })
+    next(error)
   }
 })
 
-router.get('/:productId', async (req: Request, res: Response) => {
+router.get('/:productId', async (req: Request, res: Response, next: NextFunction) => {
   const { productId } = req.params
 
   try {
@@ -34,14 +34,14 @@ router.get('/:productId', async (req: Request, res: Response) => {
 
     return res.status(200).json(data)
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' })
+    next(error)
   }
 })
 
 router.post(
   '/',
   useBodyValidator(productSchema),
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const product = req.body
 
     try {
@@ -51,7 +51,7 @@ router.post(
       })
       return res.status(200).json(data)
     } catch (error) {
-      return res.status(500).json({ error: 'Server error' })
+      next(error)
     }
   },
 )
@@ -59,7 +59,7 @@ router.post(
 router.put(
   '/:productId',
   useBodyValidator(productSchema),
-  async (req: Request, res: Response) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const { productId } = req.params
     const product = req.body
 
@@ -71,12 +71,12 @@ router.put(
       })
       return res.status(200).json(data)
     } catch (error) {
-      return res.status(500).json({ error: 'Server error' })
+      next(error)
     }
   },
 )
 
-router.delete('/:productId', async (req: Request, res: Response) => {
+router.delete('/:productId', async (req: Request, res: Response, next: NextFunction) => {
   const { productId } = req.params
 
   try {
@@ -86,7 +86,7 @@ router.delete('/:productId', async (req: Request, res: Response) => {
     })
     return res.status(200).json(data)
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' })
+    next(error)
   }
 })
 

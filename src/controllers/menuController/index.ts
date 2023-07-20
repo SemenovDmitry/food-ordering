@@ -1,15 +1,15 @@
-import { Request, Response, Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 
 import prisma from 'prisma/connection'
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = await prisma.category.findMany({ include: { products: true } })
     return res.status(200).json(data)
   } catch (error) {
-    return res.status(500).json({ error: 'Server error' })
+    next(error)
   }
 })
 
