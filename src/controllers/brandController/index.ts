@@ -6,7 +6,7 @@ import validate from 'middlewares/validate'
 
 const brandSchema = object({
   name: string().min(3),
-})
+}).strict()
 
 const router = Router()
 

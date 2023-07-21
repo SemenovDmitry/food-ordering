@@ -6,7 +6,7 @@ import validate from 'middlewares/validate'
 
 const productSchema = object({
   name: string().min(3),
-})
+}).strict()
 
 const router = Router()
 
