@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express'
 import { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
-import useBodyValidator from 'utils/useBodyValidator'
+import validate from 'middlewares/validate'
 
 const brandSchema = object({
   name: string().min(3),
@@ -39,7 +39,7 @@ router.get('/:brandId', async (req: Request, res: Response, next: NextFunction) 
 
 router.post(
   '/',
-  useBodyValidator(brandSchema),
+  validate(brandSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const brand = req.body
 
@@ -54,7 +54,7 @@ router.post(
 
 router.put(
   '/:brandId',
-  useBodyValidator(brandSchema),
+  validate(brandSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { brandId } = req.params
     const brand = req.body

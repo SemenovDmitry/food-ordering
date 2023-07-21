@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express'
 import { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
-import useBodyValidator from 'utils/useBodyValidator'
+import validate from 'middlewares/validate'
 
 const productSchema = object({
   name: string().min(3),
@@ -40,7 +40,7 @@ router.get('/:productId', async (req: Request, res: Response, next: NextFunction
 
 router.post(
   '/',
-  useBodyValidator(productSchema),
+  validate(productSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const product = req.body
 
@@ -58,7 +58,7 @@ router.post(
 
 router.put(
   '/:productId',
-  useBodyValidator(productSchema),
+  validate(productSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { productId } = req.params
     const product = req.body

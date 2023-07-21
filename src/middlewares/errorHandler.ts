@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '/types/error'
 
 export default function errorHandler(
   error: any , // Error || AppError

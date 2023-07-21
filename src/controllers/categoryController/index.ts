@@ -1,12 +1,21 @@
 import { NextFunction, Request, Response, Router } from 'express'
-import { object, string } from 'zod'
+import zod, { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
-import useBodyValidator from 'utils/useBodyValidator'
+import validate from 'middlewares/validate'
+
+type IParams = {
+  categoryId: string
+}
+
+type ICreateCategory = zod.infer<typeof categorySchema>
+type IUpdateCategory = zod.infer<typeof categorySchema>
 
 const categorySchema = object({
   name: string().min(3),
-})
+}).strict()
+
+const extractBodyCategory = ({ name }: ICreateCategory): ICreateCategory => ({ name })
 
 const router = Router()
 
@@ -19,48 +28,45 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 })
 
-router.get(
-  '/:categoryId',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { categoryId } = req.params as { categoryId: string }
+router.get('/:categoryId', async (req: Request, res: Response, next: NextFunction) => {
+  const { categoryId } = req.params as IParams
 
-    try {
-      const data = await prisma.category.findFirst({
-        where: { id: Number(categoryId) },
-      })
+  try {
+    const data = await prisma.category.findFirst({
+      where: { id: Number(categoryId) },
+    })
 
-      if (!data) {
-        return res.status(404).json({ error: 'Not found' })
-      }
-
-      return res.status(200).json(data)
-    } catch (error) {
-      next(error)
+    if (!data) {
+      return res.status(404).json({ error: 'Not found' })
     }
-  },
-)
+
+    return res.status(200).json(data)
+  } catch (error) {
+    next(error)
+  }
+})
 
 router.post(
   '/',
-  useBodyValidator(categorySchema),
+  validate(categorySchema),
   async (req: Request, res: Response, next: NextFunction) => {
-    const category = req.body
+    const category: ICreateCategory = req.body
 
     try {
       const data = await prisma.category.create({ data: category })
       return res.status(200).json(data)
     } catch (error) {
-      next(error)
+      return next(error)
     }
   },
 )
 
 router.put(
   '/:categoryId',
-  useBodyValidator(categorySchema),
+  validate(categorySchema),
   async (req: Request, res: Response, next: NextFunction) => {
-    const { categoryId } = req.params
-    const category = req.body
+    const { categoryId } = req.params as IParams
+    const category: IUpdateCategory = req.body
 
     try {
       const data = await prisma.category.update({
@@ -74,20 +80,17 @@ router.put(
   },
 )
 
-router.delete(
-  '/:categoryId',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { categoryId } = req.params
+router.delete('/:categoryId', async (req: Request, res: Response, next: NextFunction) => {
+  const { categoryId } = req.params as IParams
 
-    try {
-      const data = await prisma.category.delete({
-        where: { id: Number(categoryId) },
-      })
-      return res.status(200).json(data)
-    } catch (error) {
-      next(error)
-    }
-  },
-)
+  try {
+    const data = await prisma.category.delete({
+      where: { id: Number(categoryId) },
+    })
+    return res.status(200).json(data)
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default router
