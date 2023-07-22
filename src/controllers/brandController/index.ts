@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { object, string } from 'zod'
+import { Prisma } from '@prisma/client'
 
 import prisma from 'prisma/connection'
 import validate from 'middlewares/validate'
@@ -62,7 +63,7 @@ router.put(
     try {
       const data = await prisma.brand.update({
         where: { id: Number(brandId) },
-        data: brand,
+        data: { },
       })
       return res.status(200).json(data)
     } catch (error) {

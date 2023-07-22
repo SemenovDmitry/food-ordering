@@ -9,6 +9,9 @@ npx prisma studio
 npx prisma migrate reset   -   clear db
 
 
+ts-node-dev -r tsconfig-paths/register --files ./src/index.ts
+//--files fixes error for global types
+
 [
   {
     "id": 1,
