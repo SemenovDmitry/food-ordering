@@ -4,7 +4,7 @@ import prisma from 'prisma/connection'
 import { IWithPagination } from 'types/models'
 
 type IGetPaginatedDataParams = {
-  modelName: 'category' | 'brand'
+  modelName: 'category' | 'brand' // | 'product' (error)
   pagination: IWithPagination
   orderBy?: 'asc' | 'desc'
 }
@@ -30,11 +30,11 @@ async function getPaginatedData({ modelName, pagination, orderBy }: IGetPaginate
   const totalPages = Math.ceil(count / pageSize)
 
   return {
-    data,
     meta: {
       count,
       totalPages,
     },
+    data,
   }
 }
 

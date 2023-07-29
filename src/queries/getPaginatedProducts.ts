@@ -18,11 +18,11 @@ async function getPaginatedProducts({ page, pageSize }: IWithPagination) {
   const totalPages = Math.ceil(count / pageSize)
 
   return {
-    data,
     meta: {
       count,
       totalPages,
     },
+    data,
   }
 }
 
