@@ -46,7 +46,7 @@ router.post(
 
     try {
       const data = await prisma.brand.create({ data: brand })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       next(error)
     }
@@ -65,7 +65,7 @@ router.put(
         where: { id: Number(brandId) },
         data: { },
       })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       next(error)
     }

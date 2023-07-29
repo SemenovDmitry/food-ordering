@@ -31,7 +31,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
     })
 
     if (isUserExist) {
-      return res.status(400).json(buildFormError({ message: 'Sign up error' }))
+      return res.status(422).json(buildFormError({ message: 'Invalid email or password' }))
     }
 
     const encryptedPassword = await encryptPassword(payload.password)
@@ -53,7 +53,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
     const date = userWithToken.tokenExpiresAt ? new Date(userWithToken.tokenExpiresAt) : new Date()
     console.log('formatted tokenExpiresAt login :>> ', formatDate(date));
 
-    return res.status(200).json(protectedUser(userWithToken))
+    return res.status(201).json(protectedUser(userWithToken))
   } catch (error) {
     next(error)
   }

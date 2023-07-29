@@ -15,7 +15,7 @@ const me = async (req: Request, res: Response, next: NextFunction) => {
       data: { token, tokenExpiresAt: expiresIn },
     })
 
-    return res.status(200).json(protectedUser(userWithToken))
+    return res.status(201).json(protectedUser(userWithToken))
   } catch (error) {
     next(error)
   }

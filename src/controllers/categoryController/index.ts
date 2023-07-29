@@ -15,8 +15,6 @@ const categorySchema = object({
   name: string().min(3),
 }).strict()
 
-const extractBodyCategory = ({ name }: ICreateCategory): ICreateCategory => ({ name })
-
 const router = Router()
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
@@ -54,7 +52,7 @@ router.post(
 
     try {
       const data = await prisma.category.create({ data: category })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       return next(error)
     }
@@ -73,7 +71,7 @@ router.put(
         where: { id: Number(categoryId) },
         data: category,
       })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       next(error)
     }

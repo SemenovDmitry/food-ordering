@@ -49,7 +49,7 @@ router.post(
         data: product,
         include: { brand: true, category: true },
       })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       next(error)
     }
@@ -69,7 +69,7 @@ router.put(
         data: product,
         include: { brand: true, category: true },
       })
-      return res.status(200).json(data)
+      return res.status(201).json(data)
     } catch (error) {
       next(error)
     }

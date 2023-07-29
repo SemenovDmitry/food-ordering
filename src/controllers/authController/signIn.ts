@@ -42,7 +42,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
   const date = userWithToken.tokenExpiresAt ? new Date(userWithToken.tokenExpiresAt) : new Date()
   console.log('formatted tokenExpiresAt signIn :>> ', formatDate(date))
 
-  return res.status(200).json(protectedUser(userWithToken))
+  return res.status(201).json(protectedUser(userWithToken))
 }
 
 export default signIn
