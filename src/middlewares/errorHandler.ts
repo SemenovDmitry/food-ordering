@@ -12,5 +12,5 @@ export default function errorHandler(
   const message = error.message || 'NO ERROR MESSAGE'
   const stack = error.stack || 'NO ERROR STACK'
 
-  return response.status(status).send({ message, stack })
+  response.status(status).send({ message, stack })
 }

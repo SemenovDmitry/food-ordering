@@ -1,11 +1,13 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response, NextFunction } from 'express'
 
-export default function errorLogger (
+export default function errorLogger(
   error: Error,
   request: Request,
   response: Response,
   next: NextFunction,
 ) {
-  console.log(`Error message >>> ${error.message}`)
-  next(error) // calling next middleware
+  console.log(
+    `[Error Logger]: Path: ${request.path}, Method: ${request.method}, Stack: ${error.stack}`,
+  )
+  next(error)
 }

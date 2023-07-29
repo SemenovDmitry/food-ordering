@@ -18,7 +18,7 @@ app.use(requestLogger)
 
 app.use('/api', router)
 
-app.get('/', (req: Request, res: Response, next: NextFunction) => {
+app.get('/api', (req: Request, res: Response, next: NextFunction) => {
   return res.json({ running: true })
 })
 
