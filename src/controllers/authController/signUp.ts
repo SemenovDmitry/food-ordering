@@ -46,11 +46,11 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
     const userWithToken = await prisma.user.update({
       where: { id: user.id },
-      data: { token, tokenExpires: expiresIn },
+      data: { token, tokenExpiresAt: expiresIn },
     })
 
-    const date = userWithToken.tokenExpires ? new Date(userWithToken.tokenExpires) : new Date()
-    console.log('formatted tokenExpires login :>> ', formatDate(date));
+    const date = userWithToken.tokenExpiresAt ? new Date(userWithToken.tokenExpiresAt) : new Date()
+    console.log('formatted tokenExpiresAt login :>> ', formatDate(date));
 
     return res.status(200).json(userWithToken)
   } catch (error) {

@@ -12,7 +12,7 @@ const me = async (req: Request, res: Response, next: NextFunction) => {
 
     const userWithToken = await prisma.user.update({
       where: { id: user.id },
-      data: { token, tokenExpires: expiresIn },
+      data: { token, tokenExpiresAt: expiresIn },
     })
 
     return res.status(200).json(protectedUser(userWithToken))
