@@ -1,7 +1,6 @@
 import * as bcrypt from "bcrypt";
 
 import { IUser } from "types/models";
-import { tokenSecret } from "consts/env";
 
 export const comparePasswords = async (password: IUser['password'], hash: string) => {
   return await bcrypt.compare(password, hash);

@@ -12,7 +12,7 @@ const validate =
       if (error instanceof ZodError) {
         const bodyErrors = error.format();
         const invalidPaths = error.flatten();
-        return response.status(400).send(invalidPaths)
+        return response.status(422).send(invalidPaths)
       }
 
       return next(error)

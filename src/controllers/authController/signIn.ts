@@ -2,21 +2,22 @@ import { NextFunction, Request, Response } from 'express'
 import zod, { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
-import { comparePasswords } from 'utils/auth'
-import createToken from 'utils/createToken'
+import { comparePasswords, encryptPassword } from 'utils/auth'
+import createExpiredToken from 'utils/createExpiredToken'
 import buildFormError from 'utils/buildFormError'
 import protectedUser from 'utils/protectedUser'
 import formatDate from 'utils/formatDate'
 
-type ILoginPayload = zod.infer<typeof loginSchema>
+type ISignInPayload = zod.infer<typeof signInSchema>
 
-export const loginSchema = object({
+export const signInSchema = object({
   email: string().email(),
   password: string(),
 }).strict()
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
-  const payload = req.body as ILoginPayload
+const signIn = async (req: Request, res: Response, next: NextFunction) => {
+  const payload = req.body as ISignInPayload
+  console.log('payload :>> ', payload);
 
   try {
     const activeUser = await prisma.user.findFirst({
@@ -24,16 +25,16 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     })
 
     if (!activeUser) {
-      return res.status(400).json(buildFormError({ message: 'Invalid credentials' }))
+      return res.status(401).json(buildFormError({ message: 'Invalid email or password' }))
     }
 
     const isPass = await comparePasswords(payload.password, activeUser.password)
 
     if (!isPass) {
-      return res.status(400).json(buildFormError({ message: 'Invalid credentials' }))
+      return res.status(401).json(buildFormError({ message: 'Invalid email or password' }))
     }
 
-    const { token, expiresIn } = createToken(activeUser)
+    const { token, expiresIn } = createExpiredToken(activeUser)
 
     const userWithToken = await prisma.user.update({
       where: { id: activeUser.id },
@@ -41,7 +42,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     })
 
     const date = userWithToken.tokenExpiresAt ? new Date(userWithToken.tokenExpiresAt) : new Date()
-    console.log('formatted tokenExpiresAt login :>> ', formatDate(date));
+    console.log('formatted tokenExpiresAt signIn :>> ', formatDate(date));
 
     return res.status(200).json(protectedUser(userWithToken))
   } catch (error) {
@@ -49,4 +50,4 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export default login
+export default signIn

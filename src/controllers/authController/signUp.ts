@@ -4,9 +4,10 @@ import zod, { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
 import { encryptPassword } from 'utils/auth'
-import createToken from 'utils/createToken'
+import createExpiredToken from 'utils/createExpiredToken'
 import buildFormError from 'utils/buildFormError'
 import formatDate from 'utils/formatDate'
+import protectedUser from 'utils/protectedUser'
 
 type ISignUpPayload = zod.infer<typeof signUpSchema>
 
@@ -42,7 +43,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
 
     const user = await prisma.user.create({ data: userData })
 
-    const { token, expiresIn } = createToken(user)
+    const { token, expiresIn } = createExpiredToken(user)
 
     const userWithToken = await prisma.user.update({
       where: { id: user.id },
@@ -52,7 +53,7 @@ const signUp = async (req: Request, res: Response, next: NextFunction) => {
     const date = userWithToken.tokenExpiresAt ? new Date(userWithToken.tokenExpiresAt) : new Date()
     console.log('formatted tokenExpiresAt login :>> ', formatDate(date));
 
-    return res.status(200).json(userWithToken)
+    return res.status(200).json(protectedUser(userWithToken))
   } catch (error) {
     next(error)
   }
