@@ -3,6 +3,8 @@ import zod, { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
 import validate from 'middlewares/validate'
+import withPagination from 'middlewares/withPagination'
+import getPaginatedData from 'queries/getPaginatedData'
 
 type IParams = {
   categoryId: string
@@ -17,9 +19,9 @@ const categorySchema = object({
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', withPagination, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await prisma.category.findMany()
+    const data = await getPaginatedData({ modelName: 'category', pagination: req.pagination })
     return res.status(200).json(data)
   } catch (error) {
     next(error)

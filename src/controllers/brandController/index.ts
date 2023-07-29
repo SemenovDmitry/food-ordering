@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { object, string } from 'zod'
-import { Prisma } from '@prisma/client'
 
 import prisma from 'prisma/connection'
 import validate from 'middlewares/validate'
+import withPagination from 'middlewares/withPagination'
+import getPaginatedData from 'queries/getPaginatedData'
 
 const brandSchema = object({
   name: string().min(3),
@@ -11,9 +12,9 @@ const brandSchema = object({
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', withPagination, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await prisma.brand.findMany()
+    const data = await getPaginatedData({ modelName: 'brand', pagination: req.pagination })
     return res.status(200).json(data)
   } catch (error) {
     next(error)
@@ -63,7 +64,7 @@ router.put(
     try {
       const data = await prisma.brand.update({
         where: { id: Number(brandId) },
-        data: { },
+        data: brand,
       })
       return res.status(201).json(data)
     } catch (error) {

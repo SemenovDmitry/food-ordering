@@ -3,6 +3,8 @@ import { object, string } from 'zod'
 
 import prisma from 'prisma/connection'
 import validate from 'middlewares/validate'
+import withPagination from 'middlewares/withPagination'
+import getPaginatedProducts from 'queries/getPaginatedProducts'
 
 const productSchema = object({
   name: string().min(3),
@@ -10,9 +12,9 @@ const productSchema = object({
 
 const router = Router()
 
-router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', withPagination, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await prisma.product.findMany({ include: { brand: true, category: true } })
+    const data = await getPaginatedProducts(req.pagination)
     return res.status(200).json(data)
   } catch (error) {
     next(error)
