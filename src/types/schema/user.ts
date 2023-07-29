@@ -6,7 +6,7 @@ export const UserModel = z.object({
   email: z.string(),
   password: z.string(),
   token: z.string().nullish(),
-  tokenExpires: z.string().nullish(),
+  tokenExpiresAt: z.string().nullish(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
