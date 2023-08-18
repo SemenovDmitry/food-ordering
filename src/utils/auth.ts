@@ -8,6 +8,7 @@ export const comparePasswords = async (password: IUser['password'], hash: string
 
 export const encryptPassword = async (password: IUser['password']) => {
   const salt = await bcrypt.genSalt(10);
+  // TODO: проверить генерируется один и тот же пароль при одинаковой соли
   const encryptedPassword = await bcrypt.hash(password, salt);
   return encryptedPassword
 };

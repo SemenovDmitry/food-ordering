@@ -4,11 +4,11 @@ import prisma from 'prisma/connection'
 import { IWithPagination } from 'types/models'
 
 type IGetPaginatedDataParams = {
-  modelName: 'category' | 'brand' // | 'product' (error)
+  modelName: 'category' | 'brand' | 'product' // (error)
   pagination: IWithPagination
   orderBy?: 'asc' | 'desc'
 }
-
+// TODO: попробовать сделать через baseModel
 // NOTE: not works with models with different fields
 async function getPaginatedData({ modelName, pagination, orderBy }: IGetPaginatedDataParams) {
   const { page, pageSize } = pagination
@@ -17,14 +17,14 @@ async function getPaginatedData({ modelName, pagination, orderBy }: IGetPaginate
   const take = pageSize
 
   const [data, count] = await prisma.$transaction([
-    prisma[modelName].findMany({
+    (prisma[modelName] as any).findMany({
       take,
       skip,
       orderBy: {
         id: orderBy,
       },
     }),
-    prisma[modelName].count(),
+    (prisma[modelName] as any).count(),
   ])
 
   const totalPages = Math.ceil(count / pageSize)

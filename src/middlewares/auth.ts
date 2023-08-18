@@ -11,6 +11,8 @@ type ITokenData = {
   exp: number
 }
 
+const roles = ['admin', 'employee']
+
 const auth = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1]
 

@@ -7,10 +7,18 @@ type IPaginationQuery = {
   pageSize?: string
 }
 
-const ensurePaginatedNumbers = ({ page = '1', pageSize = DEFAULT_PAGE_SIZE.toString() }: IPaginationQuery) => {
+const MAX_PAGE_SIZE = 50
 
+const ensurePaginatedNumbers = ({
+  page = '1',
+  pageSize = DEFAULT_PAGE_SIZE.toString(),
+}: IPaginationQuery) => {
   if (Number.isNaN(Number(page)) || Number.isNaN(Number(pageSize))) {
-    throw new Error("Invalid page or page size");
+    throw new Error('Invalid page or page size')
+  }
+
+  if (Number(pageSize) > MAX_PAGE_SIZE) {
+    throw new Error('Max page size')
   }
 
   return {
@@ -20,9 +28,8 @@ const ensurePaginatedNumbers = ({ page = '1', pageSize = DEFAULT_PAGE_SIZE.toStr
 }
 
 const withPagination = (req: Request, res: Response, next: NextFunction) => {
-  const pagination = ensurePaginatedNumbers(req.query)
-  req.pagination = pagination
-  return next();
+  req.pagination = ensurePaginatedNumbers(req.query)
+  return next()
 }
 
 export default withPagination

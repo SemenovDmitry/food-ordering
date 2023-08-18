@@ -9,13 +9,17 @@ type ICreateExpiredToken = {
   expiresIn: string
 }
 
-// MINUTE * 2 and  60 * 2 same time (2 minutes)
-const tokenLiveTime = MINUTE * 2
+// MINUTE * 60 and  60 * 60 same time (60 minutes)
+const tokenLiveTime = MINUTE * 60
+const jwtExpiresIn = 60 * 60
+// { tokenLiveTime: 120000, jwtExpiresIn: 120 } // 2
+// { tokenLiveTime: 3600000, jwtExpiresIn: 3600 } // 60
 
 export const createExpiredToken = ({ id }: IUser): ICreateExpiredToken => {
+  console.log({ tokenLiveTime, jwtExpiresIn });
   const expiresIn = new Date(new Date().getTime() + tokenLiveTime)
 
-  const token = jwt.sign({ id }, tokenSecret, { expiresIn: 60 * 2 })
+  const token = jwt.sign({ id }, tokenSecret, { expiresIn: jwtExpiresIn })
 
   return {
     token,

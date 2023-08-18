@@ -1,89 +1,48 @@
-import { NextFunction, Request, Response, Router } from 'express'
+import { Router } from 'express'
 import { object, string } from 'zod'
 
-import prisma from 'prisma/connection'
-import validate from 'middlewares/validate'
+import validateBody from 'middlewares/validateBody'
 import withPagination from 'middlewares/withPagination'
-import getPaginatedData from 'queries/getPaginatedData'
+import tryCatch from 'middlewares/tryCatch'
+import auth from 'middlewares/auth'
+import validateParams from 'middlewares/validateParams'
+
+import getBrands from './getBrands'
+import getBrand from './getBrand'
+import createBrand from './createBrand'
+import updateBrand from './updateBrand'
+import deleteBrand from './deleteBrand'
 
 const brandSchema = object({
   name: string().min(3),
 }).strict()
 
+const paramsSchema = object({
+  brandId: string()
+    .transform(Number)
+    .refine((val) => !Number.isNaN(val), {
+      message: 'brandId must be a number',
+    }),
+})
+
 const router = Router()
 
-router.get('/', withPagination, async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const data = await getPaginatedData({ modelName: 'brand', pagination: req.pagination })
-    return res.status(200).json(data)
-  } catch (error) {
-    next(error)
-  }
-})
-
-router.get('/:brandId', async (req: Request, res: Response, next: NextFunction) => {
-  const { brandId } = req.params as { brandId: string }
-
-  try {
-    const data = await prisma.brand.findFirst({
-      where: { id: Number(brandId) },
-    })
-
-    if (!data) {
-      return res.status(404).json({ error: 'Not found' })
-    }
-
-    return res.status(200).json(data)
-  } catch (error) {
-    next(error)
-  }
-})
-
+router.get('/', withPagination, tryCatch(getBrands))
+router.get('/:brandId', validateParams(paramsSchema), tryCatch(getBrand))
 router.post(
   '/',
-  validate(brandSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
-    const brand = req.body
-
-    try {
-      const data = await prisma.brand.create({ data: brand })
-      return res.status(201).json(data)
-    } catch (error) {
-      next(error)
-    }
-  },
+  auth,
+  validateParams(paramsSchema),
+  validateBody(brandSchema),
+  tryCatch(createBrand),
 )
-
 router.put(
   '/:brandId',
-  validate(brandSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { brandId } = req.params
-    const brand = req.body
-
-    try {
-      const data = await prisma.brand.update({
-        where: { id: Number(brandId) },
-        data: brand,
-      })
-      return res.status(201).json(data)
-    } catch (error) {
-      next(error)
-    }
-  },
+  auth,
+  validateParams(paramsSchema),
+  validateBody(brandSchema),
+  tryCatch(updateBrand),
 )
-
-router.delete('/:brandId', async (req: Request, res: Response, next: NextFunction) => {
-  const { brandId } = req.params
-
-  try {
-    const data = await prisma.brand.delete({
-      where: { id: Number(brandId) },
-    })
-    return res.status(200).json(data)
-  } catch (error) {
-    next(error)
-  }
-})
+router.delete('/:brandId', auth, validateParams(paramsSchema), tryCatch(deleteBrand))
 
 export default router

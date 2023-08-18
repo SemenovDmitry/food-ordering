@@ -12,7 +12,7 @@ const app: Application = express()
 const PORT: number = 3001
 
 app.use(requireJsonContent)
-app.use(express.json())
+app.use(express.json()) // TODO: почитать про сериализацию полей, что бы не возвращать
 app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
